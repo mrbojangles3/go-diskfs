@@ -102,13 +102,13 @@ func (fl *File) Read(b []byte) (int, error) {
 // Use Seek() to set at a particular point
 func (fl *File) Write(p []byte) (int, error) {
 	if fl == nil || fl.filesystem == nil {
-		return 0, os.ErrClosed
+		return -1, os.ErrClosed
 	}
 	totalWritten := 0
 	fs := fl.filesystem
 	// if the file was not opened RDWR, nothing we can do
 	if !fl.isReadWrite {
-		return totalWritten, fmt.Errorf("cannot write to file opened read-only")
+		return -1, fmt.Errorf("cannot write to file opened read-only")
 	}
 	// what is the new file size?
 	writeSize := len(p)
@@ -120,7 +120,7 @@ func (fl *File) Write(p []byte) (int, error) {
 	// 1- ensure we have space and clusters
 	clusters, err := fs.allocateSpace(uint64(newSize), fl.clusterLocation)
 	if err != nil {
-		return 0x00, fmt.Errorf("unable to allocate clusters for file: %w", err)
+		return -1, fmt.Errorf("unable to allocate clusters for file: %w", err)
 	}
 
 	// update the directory entry size for the file
