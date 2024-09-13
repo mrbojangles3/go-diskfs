@@ -120,7 +120,7 @@ func (fl *File) Write(p []byte) (int, error) {
 	// 1- ensure we have space and clusters
 	clusters, err := fs.allocateSpace(uint64(newSize), fl.clusterLocation)
 	if err != nil {
-		return 0x00, fmt.Errorf("unable to allocate clusters for file: %v", err)
+		return 0x00, fmt.Errorf("unable to allocate clusters for file: %w", err)
 	}
 
 	// update the directory entry size for the file
@@ -148,7 +148,7 @@ func (fl *File) Write(p []byte) (int, error) {
 			}
 			_, err := file.WriteAt(p[0:toWrite], offset+fs.start)
 			if err != nil {
-				return totalWritten, fmt.Errorf("unable to write to file: %v", err)
+				return totalWritten, fmt.Errorf("unable to write to file: %w", err)
 			}
 			totalWritten += int(toWrite)
 			clusterIndex++
@@ -164,7 +164,7 @@ func (fl *File) Write(p []byte) (int, error) {
 		offset := uint32(start) + (clusters[i]-2)*uint32(bytesPerCluster)
 		_, err := file.WriteAt(p[totalWritten:totalWritten+toWrite], int64(offset)+fs.start)
 		if err != nil {
-			return totalWritten, fmt.Errorf("unable to write to file: %v", err)
+			return totalWritten, fmt.Errorf("unable to write to file: %w", err)
 		}
 		totalWritten += toWrite
 	}
@@ -174,7 +174,7 @@ func (fl *File) Write(p []byte) (int, error) {
 	// update the parent that we have changed the file size
 	err = fs.writeDirectoryEntries(fl.parent)
 	if err != nil {
-		return 0, fmt.Errorf("error writing directory entries to disk: %v", err)
+		return 0, fmt.Errorf("error writing directory entries to disk: %w", err)
 	}
 
 	return totalWritten, nil
