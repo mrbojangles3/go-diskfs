@@ -3,6 +3,7 @@ package fat32
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"path"
 	"strings"
@@ -759,7 +760,7 @@ func (fs *FileSystem) writeDirectoryEntries(dir *Directory) error {
 	// we need to save the entries of theparent
 	b, err := dir.entriesToBytes(fs.bytesPerCluster)
 	if err != nil {
-		return fmt.Errorf("could not create a valid byte stream for a FAT32 Entries: %v", err)
+		return fmt.Errorf("could not create a valid byte stream for a FAT32 Entries: %w", err)
 	}
 	// now have to expand with zeros to the a multiple of cluster lengths
 	// how many clusters do we need, how many do we have?
@@ -771,7 +772,7 @@ func (fs *FileSystem) writeDirectoryEntries(dir *Directory) error {
 	if len(b) > len(clusterList)*fs.bytesPerCluster {
 		clusters, err := fs.allocateSpace(uint64(len(b)), clusterList[0])
 		if err != nil {
-			return fmt.Errorf("unable to allocate space for directory entries: %v", err)
+			return fmt.Errorf("unable to allocate space for directory entries: %w", err)
 		}
 		clusterList = clusters
 	}
@@ -783,7 +784,7 @@ func (fs *FileSystem) writeDirectoryEntries(dir *Directory) error {
 		bStart := i * fs.bytesPerCluster
 		written, err := fs.file.WriteAt(b[bStart:bStart+fs.bytesPerCluster], clusterStart)
 		if err != nil {
-			return fmt.Errorf("error writing directory entries: %v", err)
+			return fmt.Errorf("error writing directory entries: %w", err)
 		}
 		if written != fs.bytesPerCluster {
 			return fmt.Errorf("wrote %d bytes to cluster %d instead of expected %d", written, cluster, fs.bytesPerCluster)
@@ -813,6 +814,7 @@ func (fs *FileSystem) mkLabel(parent *Directory, name string) (*directoryEntry, 
 // if it does not exist, it may or may not make it
 func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*directoryEntry, error) {
 	paths, err := splitPath(p)
+	slog.Info("Enter ReaDirWithMkDir", "Paths", paths)
 
 	if err != nil {
 		return nil, nil, err
@@ -828,6 +830,7 @@ func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*di
 		},
 	}
 	entries, err = fs.readDirectory(currentDir)
+	slog.Info("ReaDirWithMkDir readDirectory", "CurrentDir", CurrentDir, "Entries", entries)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read directory %s: %w", "/", err)
 	}
@@ -856,7 +859,9 @@ func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*di
 		// if not, either make it, retrieve its cluster and entries, and loop;
 		//  or error out
 		if !found {
+			slog.Info("ReaDirWithMkDir dir not found", "Paths", paths, "Create dir", doMake)
 			if doMake {
+				slog.Info("ReaDirWithMkDir dir not found, creating", "CurrentDir", CurrentDir, "Subpath", subp)
 				var subdirEntry *directoryEntry
 				subdirEntry, err = fs.mkSubdir(currentDir, subp)
 				if err != nil {
@@ -945,6 +950,7 @@ func (fs *FileSystem) allocateSpace(size uint64, previous uint32) ([]uint32, err
 	}
 	extraClusterCount := count
 
+	//len(clusters)=0
 	clusters = make([]uint32, 0, 20)
 
 	// are we extending an existing chain, or creating a new one?
@@ -954,7 +960,7 @@ func (fs *FileSystem) allocateSpace(size uint64, previous uint32) ([]uint32, err
 			return nil, fmt.Errorf("unable to get cluster list: %w", err)
 		}
 		originalClusterCount := len(clusters)
-		extraClusterCount = count - originalClusterCount
+		extraClusterCount = count - originalClusterCount // 60,363 - 0
 		// make sure that previous is the last cluster of the previous chain
 		previous = clusters[len(clusters)-1]
 	}
