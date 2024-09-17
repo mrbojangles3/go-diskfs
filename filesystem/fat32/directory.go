@@ -23,6 +23,7 @@ func (d *Directory) entriesFromBytes(b []byte) error {
 
 // entriesToBytes convert our entries to raw bytes
 func (d *Directory) entriesToBytes(bytesPerCluster int) ([]byte, error) {
+	slog.Debug("Enter entriesToBytes", "Directory", d, "len(d.entries)", len(d.entries))
 	b := make([]byte, 0)
 	for _, de := range d.entries {
 		b2, err := de.toBytes()
@@ -40,7 +41,7 @@ func (d *Directory) entriesToBytes(bytesPerCluster int) ([]byte, error) {
 
 // createEntry creates an entry in the given directory, and returns the handle to it
 func (d *Directory) createEntry(name string, cluster uint32, dir bool) (*directoryEntry, error) {
-	slog.Debug("Enter createEntry", "Name", name, "Cluster", cluster, "Directory", dir)
+	slog.Debug("Enter createEntry", "Name", name, "Cluster", cluster, "Directory", dir, "Parent", d)
 	// is it a long filename or a short filename?
 	var isLFN bool
 	// TODO: convertLfnSfn does not calculate if the short name conflicts and thus shoukld increment the last character

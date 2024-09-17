@@ -3,6 +3,7 @@ package fat32
 import (
 	"encoding/binary"
 	"fmt"
+	"log/slog"
 	"regexp"
 	"strings"
 	"time"
@@ -56,7 +57,7 @@ func (de *directoryEntry) toBytes() ([]byte, error) {
 	if de.filenameLong != "" {
 		lfnBytes, err := longFilenameBytes(de.filenameLong, de.filenameShort, de.fileExtension)
 		if err != nil {
-			return nil, fmt.Errorf("could not convert long filename to directory entries: %v", err)
+			return nil, fmt.Errorf("could not convert long filename to directory entries: %w", err)
 		}
 		b = append(b, lfnBytes...)
 	}
@@ -110,6 +111,7 @@ func (de *directoryEntry) toBytes() ([]byte, error) {
 	}
 
 	b = append(b, dosBytes...)
+	slog.Debug("Exit toBytes", "DosBytes", dosBytes)
 
 	return b, nil
 }
@@ -218,6 +220,7 @@ func longFilenameBytes(s, shortName, extension string) ([]byte, error) {
 	r := []rune(s)
 	b2SlotLength := maxCharsLongFilename * 2
 	maxChars := slots * maxCharsLongFilename
+	slog.Debug("longFilenameBytes", "long name", s, "Rune", r, "maxChars", maxChars, "slots", slots, "shortName", shortName, "extension", extension)
 	b2 := make([]byte, 0, maxChars*2)
 	// convert the rune slice into a byte slice with 2 bytes per rune
 	// vfat long filenames support UCS-2 *only*

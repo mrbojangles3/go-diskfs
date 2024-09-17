@@ -766,7 +766,7 @@ func (fs *FileSystem) writeDirectoryEntries(dir *Directory) error {
 	// how many clusters do we need, how many do we have?
 	clusterList, err := fs.getClusterList(dir.clusterLocation)
 	if err != nil {
-		return fmt.Errorf("unable to get clusters for directory: %v", err)
+		return fmt.Errorf("unable to get clusters for directory: %w", err)
 	}
 
 	if len(b) > len(clusterList)*fs.bytesPerCluster {
@@ -798,7 +798,7 @@ func (fs *FileSystem) mkFile(parent *Directory, name string) (*directoryEntry, e
 	// get a cluster chain for the file
 	clusters, err := fs.allocateSpace(1, 0)
 	if err != nil {
-		return nil, fmt.Errorf("could not allocate disk space for directory %s: %v", name, err)
+		return nil, fmt.Errorf("could not allocate disk space for directory %s: %w", name, err)
 	}
 	// create a directory entry for the file
 	return parent.createEntry(name, clusters[0], false)
