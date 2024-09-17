@@ -814,7 +814,7 @@ func (fs *FileSystem) mkLabel(parent *Directory, name string) (*directoryEntry, 
 // if it does not exist, it may or may not make it
 func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*directoryEntry, error) {
 	paths, err := splitPath(p)
-	slog.Info("Enter ReaDirWithMkDir", "Paths", paths)
+	slog.Info("Enter ReaDirWithMkDir", "Paths", paths, "doMake", doMake)
 
 	if err != nil {
 		return nil, nil, err
