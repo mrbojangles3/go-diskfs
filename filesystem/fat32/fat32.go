@@ -830,7 +830,7 @@ func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*di
 		},
 	}
 	entries, err = fs.readDirectory(currentDir)
-	slog.Info("ReaDirWithMkDir readDirectory", "CurrentDir", currentDir, "Entries", entries)
+	slog.Info("ReaDirWithMkDir readDirectory", "CurrentDir", currentDir, "len(entries)", len(entries))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read directory %s: %w", "/", err)
 	}

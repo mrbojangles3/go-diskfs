@@ -23,7 +23,7 @@ func (d *Directory) entriesFromBytes(b []byte) error {
 
 // entriesToBytes convert our entries to raw bytes
 func (d *Directory) entriesToBytes(bytesPerCluster int) ([]byte, error) {
-	slog.Debug("Enter entriesToBytes", "Directory", d, "len(d.entries)", len(d.entries))
+	//slog.Debug("Enter entriesToBytes", "Directory", d, "len(d.entries)", len(d.entries))
 	b := make([]byte, 0)
 	for _, de := range d.entries {
 		b2, err := de.toBytes()
@@ -41,7 +41,7 @@ func (d *Directory) entriesToBytes(bytesPerCluster int) ([]byte, error) {
 
 // createEntry creates an entry in the given directory, and returns the handle to it
 func (d *Directory) createEntry(name string, cluster uint32, dir bool) (*directoryEntry, error) {
-	slog.Debug("Enter createEntry", "Name", name, "Cluster", cluster, "Directory", dir, "Parent", d)
+	//slog.Debug("Enter createEntry", "Name", name, "Cluster", cluster, "Directory", dir, "Parent", d)
 	// is it a long filename or a short filename?
 	var isLFN bool
 	// TODO: convertLfnSfn does not calculate if the short name conflicts and thus shoukld increment the last character
@@ -51,7 +51,7 @@ func (d *Directory) createEntry(name string, cluster uint32, dir bool) (*directo
 	if isLFN {
 		lfn = name
 	}
-	slog.Debug("createEntry", "lfn", lfn, "shortName", shortName, "Extension", extension, "isLFN", isLFN)
+	//slog.Debug("createEntry", "lfn", lfn, "shortName", shortName, "Extension", extension, "isLFN", isLFN)
 
 	// allocate a slot for the new filename in the existing directory
 	entry := directoryEntry{
@@ -71,7 +71,7 @@ func (d *Directory) createEntry(name string, cluster uint32, dir bool) (*directo
 
 	entry.longFilenameSlots = calculateSlots(entry.filenameLong)
 	d.entries = append(d.entries, &entry)
-	slog.Debug("Exit createEntry", "len(d.enteries)", len(d.entries), "New entry", entry)
+	slog.Debug("Exit createEntry", "len(d.enteries)", len(d.entries), "New entry", entry, "directory", d)
 	return &entry, nil
 }
 
