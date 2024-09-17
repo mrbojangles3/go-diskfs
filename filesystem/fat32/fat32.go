@@ -830,7 +830,7 @@ func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*di
 		},
 	}
 	entries, err = fs.readDirectory(currentDir)
-	slog.Info("ReaDirWithMkDir readDirectory", "CurrentDir", CurrentDir, "Entries", entries)
+	slog.Info("ReaDirWithMkDir readDirectory", "CurrentDir", currentDir, "Entries", entries)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read directory %s: %w", "/", err)
 	}
@@ -861,7 +861,7 @@ func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*di
 		if !found {
 			slog.Info("ReaDirWithMkDir dir not found", "Paths", paths, "Create dir", doMake)
 			if doMake {
-				slog.Info("ReaDirWithMkDir dir not found, creating", "CurrentDir", CurrentDir, "Subpath", subp)
+				slog.Info("ReaDirWithMkDir dir not found, creating", "CurrentDir", currentDir, "Subpath", subp)
 				var subdirEntry *directoryEntry
 				subdirEntry, err = fs.mkSubdir(currentDir, subp)
 				if err != nil {
