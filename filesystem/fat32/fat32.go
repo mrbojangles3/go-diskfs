@@ -758,6 +758,7 @@ func (fs *FileSystem) mkSubdir(parent *Directory, name string) (*directoryEntry,
 
 func (fs *FileSystem) writeDirectoryEntries(dir *Directory) error {
 	// we need to save the entries of theparent
+	// Logan - just wrote massive file, updating the parent dir
 	b, err := dir.entriesToBytes(fs.bytesPerCluster)
 	if err != nil {
 		return fmt.Errorf("could not create a valid byte stream for a FAT32 Entries: %w", err)
@@ -770,12 +771,14 @@ func (fs *FileSystem) writeDirectoryEntries(dir *Directory) error {
 	}
 
 	if len(b) > len(clusterList)*fs.bytesPerCluster {
+		slog.Debug("diskfs writeDirectoryEntries, directory needs more clusters", "ClusterList", clusterlist, "len(clusterlist)", len(clusterlist), "len of bytes for dir", len(b))
 		clusters, err := fs.allocateSpace(uint64(len(b)), clusterList[0])
 		if err != nil {
 			return fmt.Errorf("unable to allocate space for directory entries: %w", err)
 		}
 		clusterList = clusters
 	}
+	slog.Debug("diskfs writeDirectoryEntries", "len(clusterlist)", len(clusterlist), "ClusterList", clusterlist)
 	// now write everything out to the cluster list
 	// read the data from all of the cluster entries in the list
 	for i, cluster := range clusterList {
@@ -789,6 +792,8 @@ func (fs *FileSystem) writeDirectoryEntries(dir *Directory) error {
 		if written != fs.bytesPerCluster {
 			return fmt.Errorf("wrote %d bytes to cluster %d instead of expected %d", written, cluster, fs.bytesPerCluster)
 		}
+		//Logan - what about partial writes?
+		//Logan - what about endof cluster marker
 	}
 	return nil
 }

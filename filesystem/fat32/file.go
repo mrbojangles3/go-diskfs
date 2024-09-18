@@ -156,7 +156,7 @@ func (fl *File) Write(p []byte) (int, error) {
 		}
 	}
 
-	slog.Debug("diskfs Write", "writeSize", writeSize, "oldSize", oldSize, "newSize", newSize, "fl.filesystem.dataStart", start, "fl.offset", fl.offset, "len(clusters)", len(clusters))
+	slog.Debug("diskfs Write", "writeSize", writeSize, "oldSize", oldSize, "newSize", newSize, "fl.filesystem.dataStart", start, "fl.offset", fl.offset, "fl.parent", fl.parent, "len(clusters)", len(clusters))
 	for i := clusterIndex; i < len(clusters); i++ {
 		left := len(p) - totalWritten
 		toWrite := bytesPerCluster
@@ -175,6 +175,7 @@ func (fl *File) Write(p []byte) (int, error) {
 	fl.offset += int64(totalWritten)
 
 	// update the parent that we have changed the file size
+	slog.Debug("diskfs WriteFile about to update parent", "fl.parent", fl.parent)
 	err = fs.writeDirectoryEntries(fl.parent)
 	if err != nil {
 		return 0, fmt.Errorf("error writing directory entries to disk: %w", err)
