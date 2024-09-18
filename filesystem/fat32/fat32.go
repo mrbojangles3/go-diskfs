@@ -785,7 +785,9 @@ func (fs *FileSystem) writeDirectoryEntries(dir *Directory) error {
 		// bytes where the cluster starts
 		clusterStart := fs.start + int64(fs.dataStart) + int64(cluster-2)*int64(fs.bytesPerCluster)
 		bStart := i * fs.bytesPerCluster
+		//why isn't this a buffer to serialize
 		written, err := fs.file.WriteAt(b[bStart:bStart+fs.bytesPerCluster], clusterStart)
+		slog.Debug("diskfs writeDirectoryEntries", "ClusterStart", clusterStart, "BStart", bStart, "bStart+fs.bytesPerCluster", bStart+fs.bytesPerCluster, "i", i)
 		if err != nil {
 			return fmt.Errorf("error writing directory entries: %w", err)
 		}
