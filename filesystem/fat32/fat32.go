@@ -771,14 +771,14 @@ func (fs *FileSystem) writeDirectoryEntries(dir *Directory) error {
 	}
 
 	if len(b) > len(clusterList)*fs.bytesPerCluster {
-		slog.Debug("diskfs writeDirectoryEntries, directory needs more clusters", "ClusterList", clusterlist, "len(clusterlist)", len(clusterlist), "len of bytes for dir", len(b))
+		slog.Debug("diskfs writeDirectoryEntries, directory needs more clusters", "ClusterList", clusterList, "len(clusterlist)", len(clusterList), "len of bytes for dir", len(b))
 		clusters, err := fs.allocateSpace(uint64(len(b)), clusterList[0])
 		if err != nil {
 			return fmt.Errorf("unable to allocate space for directory entries: %w", err)
 		}
 		clusterList = clusters
 	}
-	slog.Debug("diskfs writeDirectoryEntries", "len(clusterlist)", len(clusterlist), "ClusterList", clusterlist)
+	slog.Debug("diskfs writeDirectoryEntries", "len(clusterlist)", len(clusterList), "ClusterList", clusterList)
 	// now write everything out to the cluster list
 	// read the data from all of the cluster entries in the list
 	for i, cluster := range clusterList {
