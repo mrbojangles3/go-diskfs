@@ -3,6 +3,7 @@ package fat32
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 )
 
@@ -155,10 +156,12 @@ func (fl *File) Write(p []byte) (int, error) {
 		}
 	}
 
+	slog.Debug("diskfs Write", "writeSize", writeSize, "oldSize", oldSize, "newSize", newSize, "fl.filesystem.dataStart", start, "fl.offset", fl.offset, "len(clusters)", len(clusters))
 	for i := clusterIndex; i < len(clusters); i++ {
 		left := len(p) - totalWritten
 		toWrite := bytesPerCluster
 		if toWrite > left {
+			slog.Debug("Write - writing partial cluster", "left", left, "toWrite", toWrite)
 			toWrite = left
 		}
 		offset := uint32(start) + (clusters[i]-2)*uint32(bytesPerCluster)

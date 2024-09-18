@@ -814,7 +814,7 @@ func (fs *FileSystem) mkLabel(parent *Directory, name string) (*directoryEntry, 
 // if it does not exist, it may or may not make it
 func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*directoryEntry, error) {
 	paths, err := splitPath(p)
-	slog.Info("Enter ReaDirWithMkDir", "Paths", paths, "doMake", doMake, "p", p)
+	slog.Info("Enter ReaDirWithMkDir", "Paths", paths, "doMake", doMake, "passed in path", p)
 
 	if err != nil {
 		return nil, nil, err
@@ -830,7 +830,7 @@ func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*di
 		},
 	}
 	entries, err = fs.readDirectory(currentDir)
-	slog.Info("ReaDirWithMkDir readDirectory", "CurrentDir", currentDir, "len(entries)", len(entries))
+	slog.Info("ReaDirWithMkDir filesystem readDirectory", "CurrentDir", currentDir, "len(entries)", len(entries))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read directory %s: %w", "/", err)
 	}
@@ -861,12 +861,12 @@ func (fs *FileSystem) readDirWithMkdir(p string, doMake bool) (*Directory, []*di
 		if !found {
 			slog.Info("ReaDirWithMkDir dir not found", "Paths", paths, "Create dir", doMake)
 			if doMake {
-				slog.Info("ReaDirWithMkDir dir not found, creating", "CurrentDir", currentDir, "Subpath", subp)
 				var subdirEntry *directoryEntry
 				subdirEntry, err = fs.mkSubdir(currentDir, subp)
 				if err != nil {
 					return nil, nil, fmt.Errorf("failed to create subdirectory %s: %w", "/"+strings.Join(paths[0:i+1], "/"), err)
 				}
+				slog.Info("ReaDirWithMkDir dir not found, creating", "CurrentDir", currentDir, "Subpath", subp, "Sub Directory Entry", subdirEntry)
 				currentDir.modifyTime = subdirEntry.createTime
 				// make a basic entry for the new subdir
 				parentDirectoryCluster := currentDir.clusterLocation
