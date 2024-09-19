@@ -1,6 +1,7 @@
 package fat32
 
 import (
+	"log"
 	"time"
 )
 
@@ -67,6 +68,10 @@ func (d *Directory) createEntry(name string, cluster uint32, dir bool) (*directo
 
 	entry.longFilenameSlots = calculateSlots(entry.filenameLong)
 	d.entries = append(d.entries, &entry)
+	log.Printf("Directory: '%s' has %v entries - clusterLocation:%v ", d.directoryEntry.filenameShort, len(d.entries), d.directoryEntry.clusterLocation)
+	for _, entry := range d.entries {
+		log.Printf("Name: '%s' Size:%v", entry.filenameShort, entry.fileSize)
+	}
 	return &entry, nil
 }
 
